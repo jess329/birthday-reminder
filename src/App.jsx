@@ -1,10 +1,21 @@
 import data from "./data"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const App = () => {
   const [people, setPeople] = useState(data) 
   const [isActive, setActive] = useState("false")
+  const [userData, setUserData] = useState([{}])
   let newPeople = people
+
+  useEffect(() => {
+    let savedData = localStorage.getItem("birthdays")
+    console.log(savedData);
+    if(savedData) {
+      const userDataArray = JSON.parse(savedData)
+      console.log(userDataArray);
+      setPeople(userDataArray)
+    }
+  }, [])
 
   const toggleForm = () => {
     setActive(!isActive)
@@ -12,20 +23,25 @@ const App = () => {
   const removeOnePerson = (id) => {
     let newData = people.filter((elem) => elem.id != id)
     setPeople(newData)
+    saveUserData(newData)
   }
   const removeAll = () => {
     setPeople([])
+    saveUserData([])
   }
 
+  const saveUserData = (data) => {
+    localStorage.removeItem("birthdays")
+    const userDataJSON = JSON.stringify(data)
+    console.log(userDataJSON);
+    localStorage.setItem("birthdays", userDataJSON)
+  }
+ 
   const addPerson = () => {
     const inputs = document.getElementsByClassName("form-input")
-    const name = inputs[0]
-    newPeople = [...newPeople, {id: newPeople.length + 1, name: name.value, birthday: inputs[1].value, age: Number(inputs[2].value)}]
+    newPeople = [...newPeople, {id: newPeople.length + 1, name: inputs[0].value, birthday: inputs[1].value, age: Number(inputs[2].value)}]
     setPeople(newPeople)
-    console.log(people, newPeople);
-  }
-  const getFirstName = (name) => {
-    return name.split(" ")[0]
+    saveUserData(newPeople)
   }
 
   return (
@@ -35,7 +51,7 @@ const App = () => {
         {people.map((person) => {
           return (
             <div className="person-div" key={person.id}>
-              <h4 className="person-name">{person.name}</h4><p className="person-info">{() => getFirstName(person.name)} turns {person.age + 1} on {person.birthday} </p>
+              <h4 className="person-name">{person.name}</h4><p className="person-info">turns {person.age + 1} on {person.birthday} </p>
               <button className="btn remove" onClick={() => removeOnePerson(person.id)}>-</button>
             </div>   
           )
@@ -56,4 +72,5 @@ const App = () => {
     
   );
 };
+
 export default App; 

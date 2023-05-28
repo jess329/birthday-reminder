@@ -4,9 +4,8 @@ import { useEffect, useState } from "react";
 const App = () => {
   const [people, setPeople] = useState(data) 
   const [isActive, setActive] = useState("false")
-  const [userData, setUserData] = useState([{}])
-  let newPeople = people
 
+  // get saved user data from the last visited time on initial render and set it equal to people
   useEffect(() => {
     let savedData = localStorage.getItem("birthdays")
     console.log(savedData);
@@ -17,6 +16,7 @@ const App = () => {
     }
   }, [])
 
+  // Button Actions
   const toggleForm = () => {
     setActive(!isActive)
   }
@@ -29,7 +29,14 @@ const App = () => {
     setPeople([])
     saveUserData([])
   }
-
+  const addPerson = () => {
+    const inputs = document.getElementsByClassName("form-input")
+    let newPeople = [...newPeople, {id: newPeople.length + 1, name: inputs[0].value, birthday: inputs[1].value, age: Number(inputs[2].value)}]
+    setPeople(newPeople)
+    saveUserData(newPeople)
+  }
+  
+  // save user data in localStorage
   const saveUserData = (data) => {
     localStorage.removeItem("birthdays")
     const userDataJSON = JSON.stringify(data)
@@ -37,12 +44,7 @@ const App = () => {
     localStorage.setItem("birthdays", userDataJSON)
   }
  
-  const addPerson = () => {
-    const inputs = document.getElementsByClassName("form-input")
-    newPeople = [...newPeople, {id: newPeople.length + 1, name: inputs[0].value, birthday: inputs[1].value, age: Number(inputs[2].value)}]
-    setPeople(newPeople)
-    saveUserData(newPeople)
-  }
+  
 
   return (
     <div className="container">
